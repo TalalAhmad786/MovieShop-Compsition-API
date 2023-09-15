@@ -32,68 +32,66 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    name: "Cart",
+  <script setup>
+
+
+
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+const router = useRouter();
+
+const cart = ref([]);
+
+const itemsFromLocalStorage = computed(() => {
+  // Get cart items from local storage
+  const cartItems = localStorage.getItem("CartMovie");
+  return cartItems ? JSON.parse(cartItems) : [];
+});
+
+onMounted(() => {
+  // Initialize the cart with items from local storage
+  cart.value = itemsFromLocalStorage.value;
+});
+
+const removeFromCart = (index) =>{
+  cart.value.splice(index, 1);
+  localStorage.setItem("CartMovie", JSON.stringify(cart.value));
+
+}
+
+const incrementQuantity =(index) =>{
   
-    data() {
-      return {
-        cart: [], // An array to store cart items
-      };
-    },
-  
-    computed: {
-      itemsFromLocalStorage() {
-        // Get cart items from local storage
-        const cartItems = localStorage.getItem("CartMovie");
-        return cartItems ? JSON.parse(cartItems) : [];
-      },
-    },
-  
-    created() {
-      // Initialize the cart with items from local storage
-      this.cart = this.itemsFromLocalStorage;
-    },
-  
-    methods: {
-      removeFromCart(index) {
-        // Remove the item from the cart
-        this.cart.splice(index, 1);
-  
-        // Update local storage with the modified cart
-        localStorage.setItem("CartMovie", JSON.stringify(this.cart));
-      },
-  
-      incrementQuantity(index) {
-        // Increment the quantity of the item
-        if (this.cart[index].ticketcounter >= this.cart[index].tickets) {
-          alert("Sorry, only " + this.cart[index].tickets + " tickets available for this show.");
+  if (cart.value[index].ticketcounter >= cart.value[index].tickets) {
+          alert("Sorry, only " + cart.value[index].tickets + " tickets available for this show.");
         } else {
-          this.cart[index].ticketcounter++;
-          this.cart[index].newprice = this.cart[index].ticketcounter * this.cart[index].price;
+          cart.value[index].ticketcounter++;
+          cart.value[index].newprice = cart.value[index].ticketcounter * cart.value[index].price;
   
           // Update local storage with the modified cart
-          localStorage.setItem("CartMovie", JSON.stringify(this.cart));
+          localStorage.setItem("CartMovie", JSON.stringify(cart.value));
         }
-      },
-  
-      decrementQuantity(index) {
-        // Decrement the quantity of the item, but ensure it doesn't go below 1
-        if (this.cart[index].ticketcounter > 1) {
-          this.cart[index].ticketcounter--;
-          this.cart[index].newprice = this.cart[index].ticketcounter * this.cart[index].price;
+}
+
+const decrementQuantity =(index) =>{
+  if (cart.value[index].ticketcounter > 1) {
+          cart.value[index].ticketcounter--;
+          cart.value[index].newprice = cart.value[index].ticketcounter * cart.value[index].price;
   
           // Update local storage with the modified cart
-          localStorage.setItem("CartMovie", JSON.stringify(this.cart));
+          localStorage.setItem("CartMovie", JSON.stringify(cart.value));
         }
-      },
-  
-      getTotalPrice() {
+
+
+}
+
+const getTotalPrice= ()=> {
         // Calculate the total price of items in the cart
-        return this.cart.reduce((total, item) => total + item.newprice, 0);
-      },
-    },
-  };
+        return cart.value.reduce((total, item) => total + item.newprice, 0);
+     
+    }
   </script>
   
   <style scoped>

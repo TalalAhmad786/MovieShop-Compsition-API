@@ -57,7 +57,7 @@ actions: {
   
           const { data } = await axios.post("http://localhost:3002/users/authenticate", payload)
           const token = data.data.token
-  
+          console.log("Token in login", token)
           console.log("User id in store in login action --->", this.state.user.userId)
           commit('SET_USER', data.data)
           commit('SET_TOKEN', token)

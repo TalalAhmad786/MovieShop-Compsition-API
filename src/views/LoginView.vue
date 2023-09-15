@@ -35,58 +35,96 @@
 </template>
 
 
-<script>
-import store from '@/store'
-import { mapActions } from 'vuex'
+<script setup>
 
-export default {
-    name: 'LoginView',
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-    data() {
+const userDetails= ref({
+    email: '',
+    password: ''
+});
 
-        return {
-            userDetails: {
-                email: '',
-                password: ''
-            },
-            id: JSON.parse(localStorage.getItem("User")),
-        }
-    },
+const router = useRouter();
+const store = useStore();
 
-    methods: {
+const loginUser = async() =>{
 
-        ...mapActions({ Login: 'user/loginUser' }),
+    if(userDetails.value.email!=0 && userDetails.value.password!=0){
+        const success = await store.dispatch("user/loginUser", userDetails.value);
 
-        toregister() {
-            this.$router.push('/signup')
-        },
-        async loginUser() {
-            // this.Login(this.userDetails)
-            //this.$router.push('/home')
-
-            if (this.userDetails.email != 0 && this.userDetails.password != 0) {
-                try {
-                    const success = await this.Login(this.userDetails); 
-                    if (success) {
-                        console.log("Login successful")
-                        console.log(this.id.user._id);
-                        
-                       // store.state.user.userId= this.id.user._id;
-                        this.$router.push('/home'); 
-                    } else {
-                        console.log('Incorrect email or password.');
-                       
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                console.log('Please enter both email and password.');
-            }
+        if(success){
+            console.log("Login Successful!");
+            router.push('home');
+        }else{
+            alert("Incorrect Email or passowrd");
 
         }
+
+
+    }else{
+        alert("Please enter both email and password");
     }
 
+
 }
+
+const toregister = ()=>{
+    router.push("/signup")
+}
+
+//import store from '@/store'
+// import { mapActions } from 'vuex'
+
+// export default {
+//     name: 'LoginView',
+
+//     data() {
+
+//         return {
+//             userDetails: {
+//                 email: '',
+//                 password: ''
+//             },
+//             id: JSON.parse(localStorage.getItem("User")),
+//         }
+//     },
+
+//     methods: {
+
+//         ...mapActions({ Login: 'user/loginUser' }),
+
+//         toregister() {
+//             this.$router.push('/signup')
+//         },
+//         async loginUser() {
+//             // this.Login(this.userDetails)
+//             //this.$router.push('/home')
+
+//             if (this.userDetails.email != 0 && this.userDetails.password != 0) {
+//                 try {
+//                     const success = await this.Login(this.userDetails); 
+//                     if (success) {
+//                         console.log("Login successful")
+//                         console.log(this.id.user._id);
+                        
+//                        // store.state.user.userId= this.id.user._id;
+//                         this.$router.push('/admin'); 
+//                     } else {
+//                         console.log('Incorrect email or password.');
+                       
+//                     }
+//                 } catch (error) {
+//                     console.error(error);
+//                 }
+//             } else {
+//                 console.log('Please enter both email and password.');
+//             }
+
+//         }
+//     }
+
+// }
 
 </script>

@@ -47,11 +47,11 @@ const routes = [
         component: EditUser
       }
     ],
-    meta: {
-      adminAuth: false,
-      requiresAuth: true,
-      userAuth: true,  
-    }
+    // meta: {
+    //   adminAuth: false,
+    //   requiresAuth: true,
+    //   userAuth: true,  
+    // }
   },
   {
     path: '/admin',
@@ -78,11 +78,11 @@ const routes = [
       },
   
     ],
-    meta: {
-      adminAuth: true,
-      requiresAuth: true,
-      userAuth: false,  
-    }
+    // meta: {
+    //   adminAuth: true,
+    //   requiresAuth: true,
+    //   userAuth: false,  
+    // }
   },{
     path: '/',
     name: 'login',
@@ -149,40 +149,40 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const authUser = store.getters['getUser']; 
+// router.beforeEach((to, from, next) => {
+//   if (to.meta.requiresAuth) {
+//     const authUser = store.getters['user/getUser']; 
   
-    console.log("Get user in Nv guard-->>>>>",authUser)
-    console.log("in the navigation guards------>",authUser.user.role);
-    //console.log("in the navigation guards------>",authUser.token);
-    if (!authUser.user || !authUser.token) {
-      console.log('Must login!')
-      next({ name: 'login' });
-    } else if (to.meta.adminAuth) {
-      console.log("Else if 1 st admin ");
-      if (authUser.user.role.toLowerCase() === 'admin') {
-        console.log("if 1 st admin ");
-        next('/admin');
-      } else {
-        console.log("else 1st  admin ");
-        next('/home');
-      }
-    } else if (to.meta.userAuth) {
-      console.log("Else if 1st user");
-      if (authUser.user.role.toLowerCase() === 'user') {
-        console.log(" if 1st user");
-        next();
-      } else {
-        console.log("I am in admin");
-        next('/admin');
-      }
-    }
-  } else {
+//     console.log("Get user in Nv guard-->>>>>",authUser)
+//     console.log("in the navigation guards------>",authUser.user.role);
+//     //console.log("in the navigation guards------>",authUser.token);
+//     if (!authUser.user || !authUser.token) {
+//       console.log('Must login!');
+//       next({ name: 'login' });
+//     } else if (to.meta.adminAuth) {
+//       console.log("Else if 1 st admin ");
+//       if (authUser.user.role.toLowerCase() === 'admin') {
+//         console.log("if 1 st admin ");
+//         next();
+//       } else {
+//         console.log("else 1st  admin ");
+//         next('/home');
+//       }
+//     } else if (to.meta.userAuth) {
+//       console.log("Else if 1st user");
+//       if (authUser.user.role.toLowerCase() === 'user') {
+//         console.log(" if 1st user");
+//         next();
+//       } else {
+//         console.log("I am in admin");
+//         next('/admin');
+//       }
+//     }
+//   } else {
 
-    console.log(" last else");
-    next();
-  }
-});
+//     console.log(" last else");
+//     next();
+//   }
+// });
 
 export default router

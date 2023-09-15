@@ -11,11 +11,13 @@
             <span></span>
           </div>
           <router-link to="/cart"
+           
             class="text-white focus:ring-4 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-0 dark:bg-purple-60 focus:outline-none flex flex-col items-center">
             <font-awesome-icon icon="fa-solid fa-cart-shopping" beat size="2xl" style="color: #000000;" />
             <span class="text-xs mt-1 text-black font-bold">Cart</span>
           </router-link>
-          <router-link to="/editprofile"
+          <router-link to="/"
+          @click= "logout()"
             class="text-white focus:ring-4 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-0 dark:bg-purple-60 focus:outline-none flex flex-col items-center">
             <font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" rotation=270 size="2xl"
               style="color: #000000;" />
@@ -68,29 +70,35 @@
   </div>
 </template>
   
-<script>
-import store from '@/store';
-export default {
-  name: 'Navbar',
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-  data() {
-    return {
-      id: JSON.parse(localStorage.getItem("User")),
-      isMobileMenuOpen: false,
-      mobileMenuId: 'mobile-menu-2'
-    }
-  },
-  methods: {
-    changepass() {
-      this.$router.push({ path: `/changepassword/${this.id.user._id}` })
-    },
-    toggleMobileMenu() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    },
-  }
+// Use the store you imported previously
+const store = useStore();
+const router =  useRouter();
 
+// Define data properties
+const id = JSON.parse(localStorage.getItem("User"));
+const isMobileMenuOpen = ref(false);
+const mobileMenuId = 'mobile-menu-2';
+
+// Define methods
+const changepass = () => {
+  
+   router.push({ path: `/changepassword/${id.user._id}` });
+};
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+const logout = () => {
+  // Your logout logic here
 };
 </script>
+
   
 <style scoped>
 /* Add any additional styling you want */

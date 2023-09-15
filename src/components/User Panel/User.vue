@@ -10,12 +10,7 @@
 
 </template>
 
-<script>
+<script setup>
 import Navbar from '../User Panel/NavBar.vue'
-export default {
-    name: 'User',
-    components: {
-        Navbar
-    }
-}
+
 </script>

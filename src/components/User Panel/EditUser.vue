@@ -31,36 +31,31 @@
   </div>
 </template>
 
-<script>
-import {mapGetters, mapActions } from "vuex";
-//import store from "@/store";
+<script setup>
 
-export default {
-  name: "EditUser",
- 
-  data() {
-    return {
-      name: this.$store.state.user.user.user.user.name,
-      email: this.$store.state.user.user.user.user.email,
-    };
-  },
-  computed:{
-    ...mapGetters({GetUser: "user/getUser"})
-  },
-  methods: {
-    ...mapActions({User : "user/editUser"}),
 
-    async updateUserEvent() {
-      //console.log("In the update password --->", this.userId);
-      const obj = {
-        id: this.GetUser.user._id,
-        name: this.name,
-        email: this.email,
+
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+const router = useRouter();
+
+
+const name=  ref(store.state.user.user.user.user.name);
+const email= ref(store.state.user.user.user.user.email);
+
+const GetUser= computed(()=> store.getters["user/getUser"]);
+
+const updateUserEvent= async()=>{
+  const obj = {
+        id: GetUser.value.user._id,
+        name: name.value,
+        email: email.value,
       };
-      console.log("Obj in edit user---->", obj)
-      await this.User(obj);
-       this.$router.push("/");
-    },
-  },
-};
+      await store.dispatch("user/editUser",obj);
+      router.push("/");
+
+    }
 </script>

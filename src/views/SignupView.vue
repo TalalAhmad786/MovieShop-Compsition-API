@@ -47,30 +47,50 @@
     </div>
   </template>
 
-<script>
-import { mapActions } from 'vuex';
+<script setup>
 
-export default{
-    name: 'SignupView',
-    data(){
-        return{
-        userData: {
+//import store from '@/store';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-            name: '',
-            email: '',
-            password: ''
+const userData ={
+  name:"",
+  email: "",
+  password: ""
+}
+
+const router = useRouter();
+const store  = useStore();
+
+const toRegister = async()=>{
+  await store.dispatch("user/registerUser");
+  router.push("/");
+
+}
+
+
+// export default{
+//     name: 'SignupView',
+//     data(){
+//         return{
+//         userData: {
+
+//             name: '',
+//             email: '',
+//             password: ''
         
 
-        }
-    }
-    },
-    methods: {
-        ...mapActions({Register: 'registerUser'}),
+//         }
+//     }
+//     },
+//     methods: {
+//         ...mapActions({Register: 'registerUser'}),
 
-        toRegister(){
-            this.Register(this.userData);
-        }
+//         toRegister(){
+//             this.Register(this.userData);
+//         }
 
-    }
-}
+//     }
+// }
 </script>

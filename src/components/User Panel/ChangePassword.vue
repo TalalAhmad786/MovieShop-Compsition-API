@@ -32,35 +32,27 @@
   </div>
 </template>
 
-<script>
-import { mapActions } from "vuex";
-import store from "@/store";
-import NavBar from "./NavBar.vue";
+<script setup>
 
-export default {
-  name: "ChangePassword",
-  components: {
-    NavBar,
-  },
-  data() {
-    return {
-      // name: store.state.user.user.name,
-      getUser: JSON.parse(localStorage.getItem("User")),
-      password: null,
-    };
-  },
-  methods: {
-    ...mapActions({ pass: "user/changePassword" }),
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-    ChangePassword() {
-      //console.log(this.getUser.user._id);
-      const obj = { id: this.getUser.user._id, password: this.password };
-      console.log("obj as payload>>>>>>", obj);
-      this.pass(obj);
-      this.$router.push({ path: "/" });
-    },
-  },
-};
+const store = useStore();
+const router = useRouter();
+
+
+const getUser = ref(JSON.parse(localStorage.getItem("User")));
+const password = ref(null);
+
+const ChangePassword = async()=>{
+ 
+  
+  const obj = { id: getUser.value.user._id, password: password.value};
+await store.dispatch("user/changePassword", obj);
+router.push("/");
+}
+
 </script>
 
 <style scoped>

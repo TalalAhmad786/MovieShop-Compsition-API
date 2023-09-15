@@ -1,35 +1,43 @@
 <template>
-  <div>
+  <div >
  
     <div class="min-h-screen flex items-center justify-center bg-gray-100">
-      <div class="max-w-7xl w-full bg-white p-8 rounded shadow">
+      <div class="m-10 bgcolor max-w-7xl w-full p-8 rounded shadow">
         <h1 class="text-2xl font-semibold mb-4">Movie List</h1>
         <div class="text-center">
           Loading movies...
           <!-- {{ GetMovies }} -->
         </div>
-        <div>
-          <ul>
-            <li
-              v-for="(movie, index) in GetMovies"
-              :key="index"
-              class="mb-4 max-w-7xl w-full bg-white p-8 rounded shadow"
-            >
-              <h2 class="text-lg font-medium">{{ movie.name }}</h2>
-              <p class="text-gray-600">{{ movie.released_on }}</p>
-              <p class="text-gray-600">{{ movie.price }}</p>
-              <p class="text-gray-600">{{ movie.tickets }}</p>
-<!-- 
-              <p>{{ movie.id }}</p>
-              <p>{{ index }}</p>
-               -->
-              <button type="button" @click="toUpdate(index, movie.id)">
-                Update Movie</button
-              ><br />
-              <button type="button" @click="todelete(index, movie.id)">
-                DElete
-              </button>
-              <button type="button" @click="changepass()">CPPPP</button>
+        <div class="container mx-auto px-4">
+       
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="(movie, index) in GetMovies" :key="index"
+              class="w-full rounded overflow-hidden shadow-lg bg-gray-200 hover:bg-red-350">
+              <img class="w-full" src="https://image.offgamers.com/infolink/2023/05/netflix.jpg" alt="" />
+              <div class="px-6 py-4">
+                <h2 class="font-bold text-xl mb-2">
+                  {{ movie.name }}
+                </h2>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 ">
+                  <strong>Released On:</strong> {{ movie.released_on }}
+                </p>
+                <p class="mb-4 font-normal text-gray-700 dark:text-gray-400 ">
+                  <strong>Price:</strong> {{ movie.released_on }}
+                </p>
+                <p class="mb-5 font-normal text-gray-700 dark:text-gray-400">
+                  <strong>Tickets:</strong> {{ movie.tickets }}
+                </p>
+                <div class="flex justify center">
+                <button class="flex m-4 bg-red bg-blue-900 text-neutral-100 rounded-full p-3 hover:bg-red-800"
+                @click="toUpdate(index, movie.id)">
+                    Update Movie
+                  </button>
+                  <button class="flex m-4 bg-red bg-red-900 text-neutral-100 rounded-full p-3 hover:bg-red-800"
+                  @click="todelete(index, movie.id)">
+                    Delete Movie
+                  </button>
+            
+              </div>
 
               <div
                 v-if="showUpdate"
@@ -76,90 +84,70 @@
                   </div>
                 </div>
               </div>
-            </li>
-          </ul>
+           </div>
+           </div>
+           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters } from "vuex";
-import store from "@/store";
-//import NavBar from "./NavBar.vue";
-export default {
-  name: "AdminMovies",
+<script setup>
 
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-  computed: {
-    ...mapGetters({ GetMovies: "getMovies" }),
-  },
-
-  mounted() {
-    this.FetchMovies();
-    //console.log("kwjekwje");
-  },
-
-  data() {
-    return {
-      showUpdate: false,
-      updatedMovie: {
+const store = useStore();
+const router = useRouter();
+const updatedMovie = ref( {
         name: "",
         released_on: "",
         price: "",
         tickets: ""
-      },
-      id: JSON.parse(localStorage.getItem("User")),
-      idObj: null,
-      //loading: true,
-    };
-  },
-  methods: {
-    ...mapActions({ FetchMovies: "fetchMovies" }),
-    ...mapActions(["updateMovies"]),
-    ...mapActions(["deleteMovies"]),
+      });
+let showUpdate = ref(false);
+const id = ref(JSON.parse(localStorage.getItem("User")));
+let idObj =ref(null);
+  
+const GetMovies= computed(()=> store.getters["movie/getMovies"]);
 
-    changepass() {
-      console.log("Id in change component", this.id);
-      this.$router.push({ path: `/chPass/${this.id.user._id}` });
-    },
+onMounted(()=>{
+  store.dispatch("movie/fetchMovies");
+})
 
-    todelete(index, id) {
+const todelete = (index, id) =>{
       const delItem = { index: index, id: id };
-      this.deleteMovies(delItem);
-    },
+      store.dispatch("movie/deleteMovies", delItem);
+    };
 
-    toUpdate(index, id) {
-      this.idObj = { index: index, id: id };
-      this.updatedMovie.name = this.GetMovies[index].name;
-      this.updatedMovie.released_on = this.GetMovies[index].released_on;
-      this.updatedMovie.price= this.GetMovies[index].price;
-      this.updatedMovie.tickets = this.GetMovies[index].tickets;
+const toUpdate=(index, id) =>{
+      idObj.value = { index: index, id: id };
+      updatedMovie.value.name = GetMovies.value[index].name;
+      updatedMovie.value.released_on = GetMovies.value[index].released_on;
+      updatedMovie.value.price= GetMovies.value[index].price;
+      updatedMovie.value.tickets = GetMovies.value[index].tickets;
 
-      this.showUpdate = true;
-      // console.log("Route params id " , this.$route.params.id)
-      //     this.$router.push({ path: `/list/${index}` });
-    },
-    closePopup() {
-      console.log(this.updatedMovie);
-      this.updateMovies({ idx: this.idObj, updatedMov: this.updatedMovie });
-      this.showUpdate = false;
-    },
-  },
-  // async mounted() {
-  //   try {
-  //     const response = await fetch('https://api.example.com/movies'); // Replace with your API endpoint
-  //     const data = await response.json();
-  //     this.movies = data;
-  //     this.loading = false;
-  //   } catch (error) {
-  //     console.error('Error fetching movies:', error);
-  //   }
-  // },
-};
+      showUpdate.value = true;
+    };
+
+    const closePopup = async() =>{
+
+      store.dispatch("movie/updateMovies",{ idx: idObj.value, updatedMov: updatedMovie.value })
+      showUpdate.value = false;
+
+    }
+
 </script>
 
 <style>
 /* You can add Tailwind CSS classes here if needed */
+.bgcolor {
+  background-color: #ada9a9;
+}
+
+.bgcd {
+  background-color: #b0bbd4;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bgcolor">
+  <div class="bgcolor p-6">
     <!--
 <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
     <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="/docs/images/blog/image-4.jpg" alt="">
@@ -16,7 +16,7 @@
           Loading movies...
           <!-- {{ GetMovies }} -->
         </div>
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-4 ">
        
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="(movie, index) in GetMovies" :key="index"
@@ -35,7 +35,7 @@
                 <p class="mb-5 font-normal text-gray-700 dark:text-gray-400">
                   <strong>Tickets:</strong> {{ movie.tickets }}
                 </p>
-                <div class="text-right">
+                <div class="flex justify-center">
                   <button class="flex ml-4 bg-red bg-blue-900 text-neutral-100 rounded-full p-3 hover:bg-red-800"
                     @click="addcart(movie.id)">
                     Add to Cart
@@ -43,10 +43,6 @@
                 </div>
               </div>
             </div>
-
-
-
-
 
             <div v-if="showpopup" class="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-gray-900">
               <div class="bg-white p-12 rounded-lg shadow-md">
@@ -74,133 +70,54 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters } from "vuex";
-import store from "@/store";
-import NavBar from "./NavBar.vue";
+<script setup>
 
-export default {
-  name: "ListMovies",
-  components: {
-    NavBar,
-
-  },
-
-  computed: {
-    ...mapGetters({ GetMovies: "movie/getMovies" }),
-
-  },
-
-  created() {
-    // localStorage.setItem("KJDKS",this.GetMovies);
+import { computed, onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
 
 
-  },
-  mounted() {
-    this.FetchMovies();
-  
-    //  const movies = JSON.stringify(this.GetMovies);
-    //  localStorage.setItem("Movies", movies);
-    //  localStorage.setItem("Movies",)
-    //console.log("kwjekwje");
-  },
+let showpopup = ref(false);
+let ticketcounter = ref(null);
+let selectedMovie = ref(null);
+const isMobile = ref(false);
+const store = useStore();
 
-  data() {
-    return {
-      // showUpdate: false,
-      // updatedMovie: {
-      //   name: "",
-      //   released_on: "",
-      // },
-      showpopup: false,
-      ticketcounter: null,
-      selectedMovie: null,
-      isMobile: false,
-      // id: store.state.user.userId,
-      // idObj: null,
-      //loading: true,
-    };
-  },
-  methods: {
-    ...mapActions({ FetchMovies: "movie/fetchMovies" }),
-   
-    addcart(movieID) {
-      // this.selectedMovie =   localStorage.setItem("Movie",JSON.stringify(movie));
-      this.selectedMovie = JSON.parse(localStorage.getItem('Movies')).movies.find(movie => movie.id === movieID);
-      console.log(this.selectedMovie);
+const GetMovies= computed(()=> store.getters["movie/getMovies"]);
 
-      console.log("Ticket in list movies", movieID);
-      this.showpopup = true;
-      // console.log("Ticket in list movies", this.GetMovies[idx].tickets);
-    },
-    savechanges() {
+onMounted(()=>{
+  store.dispatch("movie/fetchMovies");
+})
 
 
-      this.selectedMovie.ticketcounter = this.ticketcounter;
-      console.log("Updated selectedmovie --->>>>", this.selectedMovie);
-      //this.showpopup =false;
-      if (this.ticketcounter > this.selectedMovie.tickets) {
-        alert(`Sorry! Only ${this.selectedMovie.tickets} tickets available for this show`);
+const addcart = (movieID) =>{
+  selectedMovie =JSON.parse(localStorage.getItem('Movies')).movies.find(movie => movie.id === movieID);
+  console.log("SDFSJASL",selectedMovie);
+  showpopup.value= ref(true);
+  //console.log(showpopup.value);
+}
+
+const savechanges= ()=>{
+  //console.log(ticketcounter.value);
+  selectedMovie.ticketcounter = ticketcounter.value;
+  if (ticketcounter.value > selectedMovie.tickets) {
+        alert(`Sorry! Only ${selectedMovie.tickets} tickets available for this show`);
       } else {
 
-        this.selectedMovie.newprice = this.selectedMovie.price * this.ticketcounter;
+        selectedMovie.newprice = selectedMovie.price * ticketcounter.value;
         let cart = JSON.parse(localStorage.getItem("CartMovie")) || [];
-        cart.push(this.selectedMovie);
+        cart.push(selectedMovie);
         localStorage.setItem("CartMovie", JSON.stringify(cart));
-        //$('#updateMovieModal').modal('hide');
-        this.showpopup = false;
+       
+        showpopup.value = false;
         alert("Item added to cart");
       }
-      // const tickets = this.GetMovies[idx].name;
-      // console.log(tickets);
-      // if (this.ticketcounter > tickets) {
-      //   alert("You cannot add more tickets");
-      // } else {
-      //   this.showpopup = false;
-      // }
-    },
-    closePopup() {
-      this.showpopup = false
-    }
-    // ...mapActions(["updateMovies"]),
-    // ...mapActions(["deleteMovies"]),
+    
+}
 
-    // changepass() {
-    //   console.log("Id in change component", this.id);
-    //   this.$router.push({ path: `/chPass/${this.id}` });
-    // },
+const closePopup = ()=>{
+      showpopup.value = false
 
-    // todelete(index, id) {
-    //   const delItem = { index: index, id: id };
-    //   this.deleteMovies(delItem);
-    // },
-
-    // toUpdate(index, id) {
-    //   this.idObj = { index: index, id: id };
-    //   this.updatedMovie.name = this.GetMovies[index].name;
-    //   this.updatedMovie.released_on = this.GetMovies[index].released_on;
-
-    //   this.showUpdate = true;
-    //   // console.log("Route params id " , this.$route.params.id)
-    //   //     this.$router.push({ path: `/list/${index}` });
-    // },
-    // closePopup() {
-    //   console.log(this.updatedMovie);
-    //   this.updateMovies({ idx: this.idObj, updatedMov: this.updatedMovie });
-    //   this.showUpdate = false;
-    // },
-  },
-  // async mounted() {
-  //   try {
-  //     const response = await fetch('https://api.example.com/movies'); // Replace with your API endpoint
-  //     const data = await response.json();
-  //     this.movies = data;
-  //     this.loading = false;
-  //   } catch (error) {
-  //     console.error('Error fetching movies:', error);
-  //   }
-  // },
-};
+}
 </script>
 
 <style>
